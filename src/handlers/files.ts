@@ -3,11 +3,14 @@ import { HandlerBase } from "./handlerbase";
 import { IFile, IWebPart } from "../schema";
 import { Web, File, Util, FileAddResult, Logger, LogLevel } from "sp-pnp-js";
 import { replaceTokens } from "../util";
+import { ProvisioningContext } from "../provisioningcontext";
 
 /**
  * Describes the Features Object Handler
  */
 export class Files extends HandlerBase {
+    private context: ProvisioningContext;
+
     /**
      * Creates a new instance of the Files class
      */
@@ -21,7 +24,9 @@ export class Files extends HandlerBase {
      * @param {Web} web The web
      * @param {IFile[]} files The files  to provision
      */
-    public async ProvisionObjects(web: Web, files: IFile[]): Promise<void> {
+    public async ProvisionObjects(web: Web, files: IFile[], context: ProvisioningContext): Promise<void> {
+        this.context = context;
+        console.log(this.context);
         super.scope_started();
         if (typeof window === "undefined") {
             throw "Files Handler not supported in Node.";

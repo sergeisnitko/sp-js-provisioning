@@ -1,10 +1,12 @@
 import { HandlerBase } from "./handlerbase";
 import { IList } from "../schema";
 import { Web } from "sp-pnp-js";
+import { ProvisioningContext } from "../provisioningcontext";
 /**
  * Describes the Lists Object Handler
  */
 export declare class Lists extends HandlerBase {
+    private context;
     private lists;
     private tokenRegex;
     /**
@@ -17,7 +19,7 @@ export declare class Lists extends HandlerBase {
      * @param {Web} web The web
      * @param {Array<IList>} lists The lists to provision
      */
-    ProvisionObjects(web: Web, lists: IList[]): Promise<void>;
+    ProvisionObjects(web: Web, lists: IList[], context: ProvisioningContext): Promise<void>;
     /**
      * Processes a list
      *

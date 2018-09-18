@@ -2,11 +2,13 @@ import * as xmljs from "xml-js";
 import { HandlerBase } from "./handlerbase";
 import { IContentTypeBinding, IList, IListInstanceFieldRef, IListView } from "../schema";
 import { Web, List, Logger, LogLevel } from "sp-pnp-js";
+import { ProvisioningContext } from "../provisioningcontext";
 
 /**
  * Describes the Lists Object Handler
  */
 export class Lists extends HandlerBase {
+    private context: ProvisioningContext;
     private lists: any[];
     private tokenRegex = /{[a-z]*:[ÆØÅæøåA-za-z ]*}/g;
 
@@ -15,7 +17,6 @@ export class Lists extends HandlerBase {
      */
     constructor() {
         super("Lists");
-        this.lists = [];
     }
 
     /**
@@ -24,7 +25,8 @@ export class Lists extends HandlerBase {
      * @param {Web} web The web
      * @param {Array<IList>} lists The lists to provision
      */
-    public async ProvisionObjects(web: Web, lists: IList[]): Promise<void> {
+    public async ProvisionObjects(web: Web, lists: IList[], context: ProvisioningContext): Promise<void> {
+        this.context = context;
         super.scope_started();
         try {
             await lists.reduce((chain, list) => chain.then(_ => this.processList(web, list)), Promise.resolve());
@@ -46,7 +48,7 @@ export class Lists extends HandlerBase {
      */
     private async processList(web: Web, lc: IList): Promise<void> {
         const { created, list, data } = await web.lists.ensure(lc.Title, lc.Description, lc.Template, lc.ContentTypesEnabled, lc.AdditionalSettings);
-        this.lists.push(data);
+        this.context.lists.push(data);
         if (created) {
             Logger.log({ data: list, level: LogLevel.Info, message: `List ${lc.Title} created successfully.` });
         }
