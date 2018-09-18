@@ -3,14 +3,13 @@ import { HandlerBase } from "./handlerbase";
 import { IContentTypeBinding, IList, IListInstanceFieldRef, IListView } from "../schema";
 import { Web, List, Logger, LogLevel } from "sp-pnp-js";
 import { ProvisioningContext } from "../provisioningcontext";
+import { replaceTokens } from "../util";
 
 /**
  * Describes the Lists Object Handler
  */
 export class Lists extends HandlerBase {
     private context: ProvisioningContext;
-    private lists: any[];
-    private tokenRegex = /{[a-z]*:[ÆØÅæøåA-za-z ]*}/g;
 
     /**
      * Creates a new instance of the Lists class
@@ -141,7 +140,7 @@ export class Lists extends HandlerBase {
 
         // Looks like e.g. lookup fields can't be updated, so we'll need to re-create the field
         try {
-            let fieldAddResult = await list.fields.createFieldAsXml(this.replaceFieldXmlTokens(fieldXml));
+            let fieldAddResult = await list.fields.createFieldAsXml(replaceTokens(fieldXml, this.context));
             await fieldAddResult.field.update({ Title: fieldDisplayName });
             Logger.log({ message: `Field '${fieldDisplayName}' added successfully to list ${lc.Title}.`, level: LogLevel.Info });
         } catch (err) {
@@ -228,31 +227,5 @@ export class Lists extends HandlerBase {
         } catch (err) {
             Logger.log({ message: `Failed to process view fields for view ${lvc.Title}.`, level: LogLevel.Info });
         }
-    }
-
-    /**
-     * Replaces tokens in field xml
-     *
-     * @param {string} fieldXml The field xml
-     */
-    private replaceFieldXmlTokens(fieldXml: string) {
-        let m;
-        while ((m = this.tokenRegex.exec(fieldXml)) !== null) {
-            if (m.index === this.tokenRegex.lastIndex) {
-                this.tokenRegex.lastIndex++;
-            }
-            m.forEach((match) => {
-                let [Type, Value] = match.replace(/[\{\}]/g, "").split(":");
-                switch (Type) {
-                    case "listid": {
-                        let list = this.lists.filter(l => l.Title === Value);
-                        if (list.length === 1) {
-                            fieldXml = fieldXml.replace(match, list[0].Id);
-                        }
-                    }
-                }
-            });
-        }
-        return fieldXml;
     }
 }

@@ -7,8 +7,6 @@ import { ProvisioningContext } from "../provisioningcontext";
  */
 export declare class Lists extends HandlerBase {
     private context;
-    private lists;
-    private tokenRegex;
     /**
      * Creates a new instance of the Lists class
      */
@@ -97,10 +95,4 @@ export declare class Lists extends HandlerBase {
      * @param {IListView} lvc The view configuration
      */
     private processViewFields(view, lvc);
-    /**
-     * Replaces tokens in field xml
-     *
-     * @param {string} fieldXml The field xml
-     */
-    private replaceFieldXmlTokens(fieldXml);
 }

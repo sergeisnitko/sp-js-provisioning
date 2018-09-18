@@ -2,7 +2,7 @@ import * as xmljs from "xml-js";
 import { HandlerBase } from "./handlerbase";
 import { IFile, IWebPart } from "../schema";
 import { Web, File, Util, FileAddResult, Logger, LogLevel } from "sp-pnp-js";
-import { replaceTokens } from "../util";
+import { replaceTokens, replaceUrlTokens } from "../util";
 import { ProvisioningContext } from "../provisioningcontext";
 
 /**
@@ -26,7 +26,6 @@ export class Files extends HandlerBase {
      */
     public async ProvisionObjects(web: Web, files: IFile[], context: ProvisioningContext): Promise<void> {
         this.context = context;
-        console.log(this.context);
         super.scope_started();
         if (typeof window === "undefined") {
             throw "Files Handler not supported in Node.";
@@ -46,7 +45,7 @@ export class Files extends HandlerBase {
      * @param {IFile} file The file
      */
     private async getFileBlob(file: IFile): Promise<Blob> {
-        const fileSrcWithoutTokens = replaceTokens(file.Src);
+        const fileSrcWithoutTokens = replaceTokens(file.Src, this.context);
         const response = await fetch(fileSrcWithoutTokens, { credentials: "include", method: "GET" });
         const fileContents = await response.text();
         const blob = new Blob([fileContents], { type: "text/plain" });
@@ -129,7 +128,7 @@ export class Files extends HandlerBase {
                     webPartManager = spFile.getLimitedWebPartManager(SP.WebParts.PersonalizationScope.shared);
                 await this.fetchWebPartContents(file.WebParts, (index, xml) => { file.WebParts[index].Contents.Xml = xml; });
                 file.WebParts.forEach(wp => {
-                    const webPartXml = replaceTokens(this.replaceWebPartXmlTokens(wp.Contents.Xml, clientContext));
+                    const webPartXml = replaceTokens(this.replaceWebPartXmlTokens(wp.Contents.Xml, clientContext), this.context);
                     const webPartDef = webPartManager.importWebPart(webPartXml);
                     const webPartInstance = webPartDef.get_webPart();
                     Logger.log({ data: { webPartXml }, level: LogLevel.Info, message: `Processing webpart ${wp.Title} for file ${file.Folder}/${file.Url}` });
@@ -163,7 +162,7 @@ export class Files extends HandlerBase {
                 return (() => {
                     return new Promise<any>(async (_res, _rej) => {
                         if (wp.Contents.FileSrc) {
-                            const fileSrc = replaceTokens(wp.Contents.FileSrc);
+                            const fileSrc = replaceUrlTokens(replaceTokens(wp.Contents.FileSrc, this.context));
                             Logger.log({ data: null, level: LogLevel.Info, message: `Retrieving contents from file '${fileSrc}'.` });
                             const response = await fetch(fileSrc, { credentials: "include", method: "GET" });
                             const xml = await response.text();
