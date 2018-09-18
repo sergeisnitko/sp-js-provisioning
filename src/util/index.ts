@@ -1,18 +1,18 @@
 import { ProvisioningContext } from "../provisioningcontext";
 
-export function replaceTokens(str: string, context: ProvisioningContext): string {
+export function replaceContextTokens(str: string, context: ProvisioningContext): string {
     let m;
     while ((m = context.tokenRegex.exec(str)) !== null) {
         if (m.index === context.tokenRegex.lastIndex) {
             context.tokenRegex.lastIndex++;
         }
         m.forEach((match) => {
-            let [Type, Value] = match.replace(/[\{\}]/g, "").split(":");
-            switch (Type) {
+            let [tokenType, tokenValue] = match.replace(/[\{\}]/g, "").split(":");
+            switch (tokenType) {
                 case "listid": {
-                    let list = context.lists.filter(l => l.Title === Value);
-                    if (list.length === 1) {
-                        str = str.replace(match, list[0].Id);
+                    let [list] = context.lists.filter(lst => lst.Title === tokenValue);
+                    if (list) {
+                        str = str.replace(match, list.Id);
                     }
                 }
             }
