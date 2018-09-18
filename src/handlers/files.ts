@@ -45,7 +45,7 @@ export class Files extends HandlerBase {
      * @param {IFile} file The file
      */
     private async getFileBlob(file: IFile): Promise<Blob> {
-        const fileSrcWithoutTokens = replaceTokens(file.Src, this.context);
+        const fileSrcWithoutTokens = replaceUrlTokens(replaceTokens(file.Src, this.context));
         const response = await fetch(fileSrcWithoutTokens, { credentials: "include", method: "GET" });
         const fileContents = await response.text();
         const blob = new Blob([fileContents], { type: "text/plain" });

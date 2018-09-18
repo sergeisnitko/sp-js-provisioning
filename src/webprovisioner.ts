@@ -28,7 +28,6 @@ export class WebProvisioner {
      * @param {Function} progressCallback Callback for progress updates
      */
     public applyTemplate(template: Schema, progressCallback?: (msg: string) => void): Promise<void> {
-
         Logger.write(`Beginning processing of web [${this.web.toUrl()}]`, LogLevel.Info);
 
         let operations = Object.getOwnPropertyNames(template).sort((name1: string, name2: string) => {

@@ -12,7 +12,7 @@ export declare class HandlerBase {
     /**
      * Provisioning objects
      */
-    ProvisionObjects(web: Web, templatePart: any, context?: ProvisioningContext): Promise<void>;
+    ProvisionObjects(web: Web, templatePart: any, _context?: ProvisioningContext): Promise<void>;
     /**
      * Writes to Logger when scope has started
      */

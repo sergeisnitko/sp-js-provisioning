@@ -14,7 +14,7 @@ export class HandlerBase {
     /**
      * Provisioning objects
      */
-    public ProvisionObjects(web: Web, templatePart: any, context?: ProvisioningContext): Promise<void> {
+    public ProvisionObjects(web: Web, templatePart: any, _context?: ProvisioningContext): Promise<void> {
         Logger.log({ data: templatePart, level: LogLevel.Warning, message: `Handler ${this.name} for web [${web.toUrl()}] does not override ProvisionObjects.` });
         return Promise.resolve();
     }
