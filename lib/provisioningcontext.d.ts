@@ -8,4 +8,5 @@ export declare class ProvisioningContext {
      * Creates a new instance of the ProvisioningContext class
      */
     constructor(lists?: Array<any>, tokenRegex?: RegExp);
+    replaceTokens(str: string): string;
 }

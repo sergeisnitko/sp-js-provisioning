@@ -3,7 +3,6 @@ import { HandlerBase } from "./handlerbase";
 import { IContentTypeBinding, IList, IListInstanceFieldRef, IListView } from "../schema";
 import { Web, List, Logger, LogLevel } from "sp-pnp-js";
 import { ProvisioningContext } from "../provisioningcontext";
-import { replaceContextTokens } from "../util";
 
 /**
  * Describes the Lists Object Handler
@@ -140,7 +139,7 @@ export class Lists extends HandlerBase {
 
         // Looks like e.g. lookup fields can't be updated, so we'll need to re-create the field
         try {
-            let fieldAddResult = await list.fields.createFieldAsXml(replaceContextTokens(fieldXml, this.context));
+            let fieldAddResult = await list.fields.createFieldAsXml(this.context.replaceTokens(fieldXml));
             await fieldAddResult.field.update({ Title: fieldDisplayName });
             Logger.log({ message: `Field '${fieldDisplayName}' added successfully to list ${lc.Title}.`, level: LogLevel.Info });
         } catch (err) {

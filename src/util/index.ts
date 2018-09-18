@@ -1,26 +1,3 @@
-import { ProvisioningContext } from "../provisioningcontext";
-
-export function replaceContextTokens(str: string, context: ProvisioningContext): string {
-    let m;
-    while ((m = context.tokenRegex.exec(str)) !== null) {
-        if (m.index === context.tokenRegex.lastIndex) {
-            context.tokenRegex.lastIndex++;
-        }
-        m.forEach((match) => {
-            let [tokenType, tokenValue] = match.replace(/[\{\}]/g, "").split(":");
-            switch (tokenType) {
-                case "listid": {
-                    let [list] = context.lists.filter(lst => lst.Title === tokenValue);
-                    if (list) {
-                        str = str.replace(match, list.Id);
-                    }
-                }
-            }
-        });
-    }
-    return str;
-}
-
 export function replaceUrlTokens(str: string): string {
     return str
         .replace(/{sitecollection}/g, _spPageContextInfo.siteAbsoluteUrl)
